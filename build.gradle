@@ -1,0 +1,76 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.owasp:dependency-check-gradle:6.3.1"
+    }
+}
+
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.0.4'
+  id 'io.spring.dependency-management' version '1.1.0'
+  id("org.sonatype.gradle.plugins.scan") version "2.6.0"
+  id 'org.graalvm.buildtools.native' version '0.9.20'
+  id "io.snyk.gradle.plugin.snykplugin" version "0.4"
+}
+
+apply plugin: 'java'
+
+group = 'org.springframework.samples'
+version = '3.0.0'
+sourceCompatibility = '17'
+
+repositories {
+  mavenCentral()
+}
+
+ext.webjarsFontawesomeVersion = "4.7.0"
+ext.webjarsBootstrapVersion = "5.2.3"
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'javax.cache:cache-api'
+  implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+  implementation 'org.owasp:dependency-check-gradle:6.3.1'
+  runtimeOnly 'org.springframework.boot:spring-boot-starter-actuator'
+  runtimeOnly "org.webjars.npm:bootstrap:${webjarsBootstrapVersion}"
+  runtimeOnly "org.webjars.npm:font-awesome:${webjarsFontawesomeVersion}"
+  runtimeOnly 'com.github.ben-manes.caffeine:caffeine'
+  runtimeOnly 'com.h2database:h2'
+  runtimeOnly 'com.mysql:mysql-connector-j'
+  runtimeOnly 'org.postgresql:postgresql'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+snyk {
+    severity = 'low'
+    api = '00fb106b-3202-46c5-b12c-7c8e9c9966d3'
+    autoDownload = true
+    autoUpdate = true
+}
+
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    autoUpdate = true
+}
+
+ossIndexAudit {
+    allConfigurations = true // if true includes the dependencies in all resolvable configurations. By default is false, meaning only 'compileClasspath', 'runtimeClasspath', 'releaseCompileClasspath' and 'releaseRuntimeClasspath' are considered
+    useCache = true // true by default
+    showAll = true // if true prints all dependencies. By default is false, meaning only dependencies with vulnerabilities will be printed.
+    printBanner = true // if true will print ASCII text banner. By default is true.
+}
+
